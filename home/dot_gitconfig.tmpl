@@ -1,0 +1,50 @@
+[user]
+	name = {{ .name }}
+	email = {{ .email }}
+[init]
+	defaultBranch = main
+[core]
+	editor = nvim
+	pager = delta
+[submodule]
+	recurse = true
+[pull]
+	ff = only
+
+[filter "lfs"]
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+	clean = git-lfs clean -- %f
+
+[merge]
+	conflictstyle = zdiff3
+
+[interactive]
+	diffFilter = delta --color-only --features=interactive
+
+[diff]
+	colorMoved = default
+
+[delta]
+	navigate = true
+	hyperlinks = true
+	hyperlinks-file-link-format = "file-line://{path}:{line}"
+	features = side-by-side line-numbers decorations
+	syntax-theme = Dracula
+	plus-style = syntax "#003800"
+
+[delta "interactive"]
+	keep-plus-minus-markers = true
+
+[delta "decorations"]
+	commit-decoration-style = bold yellow box ul
+	file-style = bold yellow ul
+	file-decoration-style = none
+	hunk-header-decoration-style = cyan box ul
+
+[delta "line-numbers"]
+	line-numbers-left-style = cyan
+	line-numbers-right-style = cyan
+	line-numbers-minus-style = 124
+	line-numbers-plus-style = 28

@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Neovim plugins at the versions in nvim/lazy-lock.json, then the language servers and parsers LazyVim
+# would otherwise install the first time you open a file. Runs once, on the first install; after that,
+# update plugins with :Lazy update and commit nvim/lazy-lock.json.
+set -euo pipefail
+export PATH="$HOME/.local/bin:$HOME/.local/share/mise/shims:$PATH"
+repo={{ .chezmoi.workingTree | quote }}
+printf '\n\033[1;34m==> %s\033[0m\n' "Installing Neovim plugins, language servers and parsers"
+nvim --headless "+Lazy! restore" "+luafile $repo/scripts/nvim-first-run.lua"
+# The first start installs the newest plugins and rewrites the lockfile (~/.config/nvim is a symlink
+# into this repo), so put the committed one back and restore to it.
+git -C "$repo" checkout -- nvim/lazy-lock.json
+nvim --headless "+Lazy! restore" +qa

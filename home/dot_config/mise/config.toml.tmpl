@@ -1,0 +1,116 @@
+# CLI tools for both systems, and on macOS the apps and macOS settings too. After editing,
+# `chezmoi apply` installs what's new; `mise upgrade` updates the tools.
+# On macOS, `mise bootstrap status` shows any app or setting that differs from this file.
+# Pin a version for one project with `mise use terraform@1.x` in that project (writes a
+# mise.toml there).
+
+[tools]
+# --- Shell ---
+fzf = "latest"
+direnv = "latest"
+starship = "latest"
+
+# --- Editor and git ---
+neovim = "latest"
+tree-sitter = "latest"  # LazyVim builds treesitter parsers with it
+node = "lts"            # Mason installs several language servers with npm
+github-cli = "latest"   # gh
+git-lfs = "latest"
+delta = "latest"
+lazygit = "latest"
+prek = "latest"         # fast drop-in for pre-commit; `prek install` sets up hooks
+
+# --- Everyday CLI ---
+ripgrep = "latest"
+fd = "latest"
+bat = "latest"
+lsd = "latest"
+jq = "latest"
+yq = "latest"
+glow = "latest"      # renders Markdown in the terminal
+dust = "latest"      # what uses the disk space, as a tree (`du` is an alias for it)
+duf = "latest"       # disks and free space, as a table (`df` is an alias for it)
+gdu = "latest"       # browse folders by size, and delete, interactively
+bottom = "latest"    # `btm`: a top with graphs
+zoxide = "latest"    # a smarter `cd`: jump to folders you use by part of their name
+tealdeer = "latest"  # `tldr`: short help pages with examples
+
+# --- Python: uv for pure-Python projects, pixi for conda-forge ones ---
+uv = "latest"
+pixi = "latest"
+
+# --- Terraform and AWS ---
+terraform = "latest"
+tflint = "latest"
+terraform-docs = "latest"
+aws-cli = "latest"
+
+{{- if eq .chezmoi.os "linux" }}
+
+# --- Snowflake ---
+# `snow`, the Snowflake CLI. Not in mise's registry, so it comes from PyPI, installed with uv.
+"pypi:snowflake-cli" = "latest"
+{{- end }}
+
+# --- Docker ---
+lazydocker = "latest"
+{{- if eq .chezmoi.os "darwin" }}
+# macOS: Docker without Docker Desktop. Colima runs the Linux VM (with Lima); `docker` is just
+# the CLI. Start it with `colima start`. (Fedora gets Docker Engine from its desktop setup script.)
+colima = "latest"
+lima = "latest"
+docker-cli = "latest"
+docker-compose = "latest"  # chezmoi's setup script links it in as `docker compose` too
+# macOS: the Command Line Tools' python3 (3.9) is too old for Mason's Python tools.
+python = "3.14"
+
+# --- macOS settings ---
+# Settings mise can't make are in the README.
+
+[bootstrap.macos.dock]
+autohide = true
+tilesize = 42
+magnification = false
+
+[bootstrap.macos.finder]
+preferred_view_style = "list"
+
+[bootstrap.macos.defaults.NSGlobalDomain]
+AppleInterfaceStyle = "Dark"
+AppleShowAllExtensions = true
+NSAutomaticPeriodSubstitutionEnabled = false  # no full stop on double-space
+
+# Dock and Finder read their settings when they start.
+[bootstrap.hooks]
+post-defaults = "killall Dock Finder 2>/dev/null || true"
+
+[bootstrap.macos.keyboard]
+automatic_capitalization = false
+automatic_spelling_correction = false
+
+# Secondary (two-finger) click, for built-in and Bluetooth trackpads.
+[bootstrap.macos.defaults."com.apple.AppleMultitouchTrackpad"]
+TrackpadRightClick = true
+
+[bootstrap.macos.defaults."com.apple.driver.AppleBluetoothMultitouch.trackpad"]
+TrackpadRightClick = true
+
+# --- Apps ---
+# Homebrew casks, which mise installs itself, without Homebrew. Most of these apps update
+# themselves afterwards. The first install asks for your password once, to create the folder
+# where mise records them (/opt/homebrew/Caskroom).
+
+[bootstrap.brew]
+adopt = true  # take over an app that's already installed, if it's identical to the download
+
+[bootstrap.packages]
+"brew-cask:ghostty" = "latest"
+"brew-cask:visual-studio-code" = "latest"
+"brew-cask:zed" = "latest"  # editor; Claude runs in its Agent Panel (Claude Agent)
+"brew-cask:zen" = "latest"
+"brew-cask:obsidian" = "latest"
+"brew-cask:slack" = "latest"
+"brew-cask:drawio" = "latest"     # draw.io diagrams
+"brew-cask:rectangle" = "latest"  # then allow Accessibility access and Launch at login
+"brew-cask:font-jetbrains-mono-nerd-font" = "latest"  # for VS Code's terminal
+{{- end }}

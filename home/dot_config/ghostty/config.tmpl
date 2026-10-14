@@ -1,0 +1,24 @@
+# Ghostty config: https://ghostty.org/docs/config/reference
+# Browse themes with `ghostty +list-themes`; reload config with Cmd+Shift+, (macOS) or Ctrl+Shift+, .
+# Ghostty bundles JetBrains Mono with Nerd Font symbols, so no font install is needed.
+
+theme = TokyoNight
+font-size = 11
+
+# Dim unfocused splits (like WezTerm's inactive_pane_hsb).
+unfocused-split-opacity = 0.6
+{{- if eq .chezmoi.os "darwin" }}
+
+# Keep Option as Option so it can type characters such as # and € on a UK layout.
+macos-option-as-alt = false
+{{- else }}
+
+# Close the current pane (there's no default for this on Linux; Ctrl+Shift+W closes the whole tab).
+keybind = ctrl+shift+x=close_surface
+# Close every other tab (like Zed's Ctrl+Alt+T).
+keybind = ctrl+alt+t=close_tab:other
+# Make all panes the same size (macOS has Cmd+Ctrl+=).
+keybind = super+ctrl+equal=equalize_splits
+# Show every tab, to pick one.
+keybind = ctrl+shift+space=toggle_tab_overview
+{{- end }}

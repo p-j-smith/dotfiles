@@ -1,0 +1,7 @@
+{{- if eq .chezmoi.os "linux" -}}
+#!/usr/bin/env bash
+# zsh, git, and the compilers and tools that Neovim's parsers and Mason need. Runs once, before the dotfiles.
+set -euo pipefail
+printf '\n\033[1;34m==> %s\033[0m\n' "Installing base packages (dnf)"
+sudo dnf install -y zsh git gcc gcc-c++ make curl unzip tar gzip python3
+{{- end }}

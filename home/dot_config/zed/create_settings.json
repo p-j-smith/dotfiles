@@ -1,0 +1,4 @@
+// Zed settings. Zed adds to this file itself when you change settings in its UI.
+{
+  "vim_mode": true
+}

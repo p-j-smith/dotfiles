@@ -1,0 +1,11 @@
+# https://github.com/jesseduffield/lazygit/blob/master/docs/Config.md
+git:
+  # delta, as in https://github.com/jesseduffield/lazygit/blob/master/docs/Custom_DiffRenderers.md#delta
+  # It reads the rest of its settings from ~/.gitconfig's [delta] section (side-by-side, line
+  # numbers, theme, colours), so diffs look the same as in `git diff`. Added here: light or dark to
+  # match the terminal, lazygit's panel width, and line numbers you can click to open the file at
+  # that line in your editor.
+  diffRenderers:
+    - command: >-
+        delta --{{colorScheme}} --paging=never --width={{width}}
+        --hyperlinks-file-link-format="lazygit-edit://{path}:{line}"

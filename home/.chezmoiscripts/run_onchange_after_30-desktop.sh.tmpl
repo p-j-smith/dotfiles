@@ -1,0 +1,82 @@
+{{- if eq .chezmoi.os "linux" -}}
+#!/usr/bin/env bash
+# Desktop apps, Docker, fonts, keyboard layout and shortcuts. Runs again whenever this file changes;
+# every step is safe to repeat.
+set -euo pipefail
+
+log() { printf '\n\033[1;34m==> %s\033[0m\n' "$*"; }
+
+log "dnf plugins (copr, config-manager)"
+sudo dnf install -y dnf5-plugins
+
+log "Clipboard support for Neovim on Wayland"
+sudo dnf install -y wl-clipboard
+
+log "Ghostty (COPR)"
+sudo dnf copr enable -y scottames/ghostty
+sudo dnf install -y ghostty
+
+log "VS Code (Microsoft repo)"
+if [[ ! -f /etc/yum.repos.d/vscode.repo ]]; then
+  sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
+  sudo tee /etc/yum.repos.d/vscode.repo >/dev/null <<'EOF'
+[code]
+name=Visual Studio Code
+baseurl=https://packages.microsoft.com/yumrepos/vscode
+enabled=1
+autorefresh=1
+type=rpm-md
+gpgcheck=1
+gpgkey=https://packages.microsoft.com/keys/microsoft.asc
+EOF
+fi
+sudo dnf install -y code
+
+log "Docker Engine (Docker's repo)"
+if [[ ! -f /etc/yum.repos.d/docker-ce.repo ]]; then
+  sudo dnf config-manager addrepo --from-repofile=https://download.docker.com/linux/fedora/docker-ce.repo
+fi
+sudo dnf install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo usermod -aG docker "$(id -un)"
+sudo systemctl enable --now docker
+
+log "JetBrains Mono Nerd Font (for VS Code's terminal; Ghostty has its own copy)"
+font_dir="$HOME/.local/share/fonts/JetBrainsMonoNerdFont"
+if [[ ! -d $font_dir ]]; then
+  mkdir -p "$font_dir"
+  curl -fsSL https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.tar.xz \
+    | tar -xJ -C "$font_dir"
+  fc-cache -f "$font_dir"
+fi
+
+log "Zen browser, draw.io and Slack (Flatpaks from Flathub)"
+sudo dnf install -y flatpak
+sudo flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+sudo flatpak install -y --noninteractive flathub app.zen_browser.zen com.jgraph.drawio.desktop com.slack.Slack
+
+log "Keyboard layout: English (UK) for the Microsoft keyboard, with the Magic Keyboard's Mac layout second"
+# Switch between them in the top bar or with Super+Space. The system setting is for the login screen
+# and the text console; the gsettings one is for the desktop session.
+sudo localectl set-x11-keymap gb,gb pc105 ,mac
+sudo localectl set-keymap gb
+if [[ -n ${DBUS_SESSION_BUS_ADDRESS:-} ]]; then   # gsettings needs the desktop session
+  gsettings set org.gnome.desktop.input-sources sources "[('xkb', 'gb'), ('xkb', 'gb+mac')]"
+  # Leave Ctrl+Alt+arrows to Ghostty (moving between panes). Super+PageUp/PageDown and
+  # Super+Alt+Left/Right still switch workspaces.
+  k=org.gnome.desktop.wm.keybindings
+  gsettings set $k switch-to-workspace-left "['<Super>Page_Up', '<Super>KP_Prior', '<Super><Alt>Left']"
+  gsettings set $k switch-to-workspace-right "['<Super>Page_Down', '<Super>KP_Next', '<Super><Alt>Right']"
+  gsettings set $k switch-to-workspace-up "[]"
+  gsettings set $k switch-to-workspace-down "[]"
+  # Super+Shift+S: sleep
+  gsettings set org.gnome.settings-daemon.plugins.media-keys suspend "['<Super><Shift>s']"
+fi
+
+log "Zed editor (Zed's install script: into ~/.local, and it updates itself)"
+# Not the Flathub package: that's community-maintained, and its sandbox hides mise's tools.
+if [[ ! -x ~/.local/bin/zed ]]; then
+  curl -fsSL https://zed.dev/install.sh | sh
+fi
+
+log "Desktop done. Log out and back in so the docker group membership applies."
+{{- end }}

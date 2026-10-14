@@ -1,0 +1,13 @@
+# PATH setup. Runs for login shells; .zshrc also sources it for non-login shells, so it must be
+# safe to run twice.
+
+typeset -U path  # drop duplicate PATH entries
+
+# ~/.local/bin: mise and chezmoi themselves, uv tools etc.
+# mise's shims make its tools available outside interactive shells too (git running delta,
+# editors, scripts). Interactive shells put the tools themselves first (`mise activate` in .zshrc).
+path=(~/.local/bin ~/.local/share/mise/shims $path)
+
+# macOS: launchers for apps that mise installs from Homebrew casks (code, zed, zen, obsidian).
+# Last, so they never shadow anything else.
+[[ -d /opt/homebrew/bin ]] && path+=(/opt/homebrew/bin)

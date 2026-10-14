@@ -1,0 +1,9 @@
+{{- if eq .chezmoi.os "darwin" -}}
+#!/usr/bin/env bash
+# The Command Line Tools: git, and the compilers Neovim's parsers need. Runs once, before the dotfiles.
+until xcode-select -p >/dev/null 2>&1; do
+  printf '\n\033[1;34m==> %s\033[0m\n' "Installing the Command Line Tools (click Install in the dialog)"
+  xcode-select --install 2>/dev/null || true
+  sleep 20
+done
+{{- end }}

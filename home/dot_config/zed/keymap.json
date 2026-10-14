@@ -1,0 +1,20 @@
+// Zed key bindings, added to Zed's defaults and its vim mode (vim_mode in settings.json).
+// These match LazyVim, in vim's normal and visual modes only.
+[
+  {
+    "context": "VimControl && !menu",
+    "bindings": {
+      // Move between panes, as in Neovim
+      "ctrl-h": "workspace::ActivatePaneLeft",
+      "ctrl-j": "workspace::ActivatePaneDown",
+      "ctrl-k": "workspace::ActivatePaneUp",
+      "ctrl-l": "workspace::ActivatePaneRight",
+      // Previous / next tab, as LazyVim does for buffers
+      "shift-h": "pane::ActivatePreviousItem",
+      "shift-l": "pane::ActivateNextItem",
+      // Split right / below
+      "space |": "pane::SplitRight",
+      "space -": "pane::SplitDown"
+    }
+  }
+]

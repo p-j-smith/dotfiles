@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+# mise and every tool in ~/.config/mise/config.toml; on macOS, also the apps and macOS settings from
+# the same file. Runs again whenever that file changes.
+# mise config hash: {{ include "dot_config/mise/config.toml.tmpl" | sha256sum }}
+set -euo pipefail
+log() { printf '\n\033[1;34m==> %s\033[0m\n' "$*"; }
+
+if [[ ! -x ~/.local/bin/mise ]]; then
+  log "Installing mise"
+  curl -fsSL https://mise.run | sh
+fi
+export PATH="$HOME/.local/bin:$HOME/.local/share/mise/shims:$PATH"
+
+log "Installing CLI tools"
+mise install --yes
+# tldr's pages are downloaded, not installed with it.
+tldr --update >/dev/null || echo "tldr --update failed; run it later"
+{{- if eq .chezmoi.os "darwin" }}
+
+# `docker compose` looks for the plugin here; the shim keeps working across upgrades.
+mkdir -p ~/.docker/cli-plugins
+ln -sf ~/.local/share/mise/shims/docker-compose ~/.docker/cli-plugins/docker-compose
+
+log "Applying macOS settings and installing apps (asks for your password once)"
+mise bootstrap --only macos-defaults,packages --yes
+{{- end }}
+
+# Completions, as files the shell loads when needed. eval-ing each tool's script at every startup
+# is slow (pixi's alone took 0.5 s). A tool that isn't installed is skipped.
+log "Writing shell completions to ~/.zfunc"
+mkdir -p ~/.zfunc
+while read -r name cmd; do
+  if out="$($cmd 2>/dev/null)"; then printf '%s\n' "$out" >~/.zfunc/_"$name"; fi
+done <<'LIST'
+chezmoi chezmoi completion zsh
+gh gh completion -s zsh
+uv uv generate-shell-completion zsh
+pixi pixi completion --shell zsh
+rg rg --generate complete-zsh
+fd fd --gen-completions zsh
+bat bat --completion zsh
+delta delta --generate-completion zsh
+yq yq shell-completion zsh
+docker docker completion zsh
+colima colima completion zsh
+LIST

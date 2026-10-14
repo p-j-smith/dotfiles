@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# zsh as the login shell (Linux; it already is on macOS), then zim, which downloads its modules the
+# first time an interactive zsh starts.
+set -euo pipefail
+log() { printf '\n\033[1;34m==> %s\033[0m\n' "$*"; }
+{{- if eq .chezmoi.os "linux" }}
+zsh_path="$(command -v zsh)"
+if [[ "$(getent passwd "$(id -un)" | cut -d: -f7)" != "$zsh_path" ]]; then
+  log "Making zsh the login shell"
+  sudo usermod --shell "$zsh_path" "$(id -un)"
+fi
+{{- end }}
+log "Installing zsh modules"
+zsh -ic exit

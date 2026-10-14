@@ -1,0 +1,12 @@
+{{- /* Rendered to ~/.config/chezmoi/chezmoi.toml by `chezmoi init`. Asks once; the answers stay on this machine. */ -}}
+{{- $name := promptStringOnce . "name" "Your name, for git commits" -}}
+{{- $email := promptStringOnce . "email" "Your email address, for git commits" -}}
+# Use the repo where it was cloned (~/.local/share/chezmoi by default, or e.g. ~/github/dotfiles).
+sourceDir = {{ .chezmoi.workingTree | quote }}
+
+[data]
+name = {{ $name | quote }}
+email = {{ $email | quote }}
+
+[diff]
+pager = "delta"

@@ -1,0 +1,6 @@
+# Read by every zsh, including scripts, so keep this small.
+
+# Use ~/.config on macOS too, as on Linux (lazygit, lazydocker etc. otherwise use ~/Library/Application Support).
+export XDG_CONFIG_HOME="$HOME/.config"
+export EDITOR=nvim
+export VISUAL=nvim

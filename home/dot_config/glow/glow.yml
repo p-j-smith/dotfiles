@@ -1,0 +1,21 @@
+# glow, the Markdown viewer: https://github.com/charmbracelet/glow#the-config-file
+# Settings that match glow's defaults are noted, so this file shows the whole picture.
+
+# style name or JSON path. glow's default, "auto", asks the terminal whether its background is
+# light or dark; these terminals are always dark.
+style: "dark"
+# mouse wheel scrolling (TUI only; default off). Hold Shift to select text with the mouse.
+mouse: true
+# show files in a pager (less) rather than printing them (default off). A folder still opens the
+# file browser.
+pager: true
+# 0 (the default) wraps at the window's width, but never past 120 columns. In the shell, the
+# `glow` alias passes the full window width (-w) instead.
+width: 0
+# show hidden and git-ignored files in the file browser (glow's default). glow can't show hidden
+# files without also showing ignored ones.
+all: true
+# line numbers in the file browser's reader (TUI only; default off)
+showLineNumbers: true
+# keep the Markdown's own line breaks (default off: reflow paragraphs)
+preserveNewLines: false
